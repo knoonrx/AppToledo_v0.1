@@ -13,9 +13,26 @@ let ipt = angular.module('app', [])
             }
         };
     })
+    .factory('enviarAPI', $http => {
+        $http.defaults.headers.post["Content-Type"] = "application/json";
+        return {
+            postImage: dados => $http({
+                url: 'http://alessandro.softhotelaria.com/api/UploadCustomerImage',
+                method: 'POST',
+                data: JSON.stringify(dados),
+            })
+            .then(response =>  console.log(response)),
+            enviarColeta: dados => $http({
+                url: 'http://alessandro.softhotelaria.com/api/UploadCustomerImage',
+                method: 'POST',
+                data: JSON.stringify(dados),
+            })
+            .then(response =>  console.log(response))
+        }
+    })
     .controller('IndexController',
-        ['$scope', '$q', '$http', 'produtosAPI', 'databaseAPI',
-            ($scope, $q, $http, produtosAPI, databaseAPI) => {
+        ['$scope', '$q', '$http', 'produtosAPI', 'databaseAPI', 'enviarAPI',
+            ($scope, $q, $http, produtosAPI, databaseAPI, enviarAPI) => {
                 const Database_Name = 'DatabaseIPT';
                 const Version = 1.0;
                 const Text_Description = '';
@@ -64,7 +81,7 @@ let ipt = angular.module('app', [])
                           }
                        );
                 }
-                const getListaProdutosPromise = tabela => {
+                const getListaProdutosPromise = (tabela) => {
                     let deferred = $q.defer();
                     databaseAPI.showAll(dbObj, tabela).then(listview => deferred.resolve(listview));
                     return deferred.promise;
@@ -114,18 +131,32 @@ let ipt = angular.module('app', [])
                             ctx.putImageData(imgData, 0, 0);
                         }, function (msg) {
                             /* This is the "error" callback. */
-                            alert('Could not obtain a signature due to an error: ' + msg);
+                            alert('Não foi possível coletar sua assinatura: ' + msg);
                         },
                         /* This final string is optional and defaults to a similar string. */
-                        'Please put your signature down below');
+                        'Por favor deixe sua assinatura logo abaixo');
+                };
+                const enviarImagem = () => {
+                    var dados = {};
+                    dados.Description = "";
+                    dados.ImageData = document.getElementById("preview").src.replace("data:image/png;base64,", "");
+
+                    return enviarAPI.postComunicado(dados);
+                };
+                const to_image = () => {
+                    const canvas = document.getElementById("signature");
+                    document.getElementById("preview").src = canvas.toDataURL();
+                    alert(document.getElementById("preview").src);
+                    return enviarImagem();
                 };
 
+                $scope.clickToImage = () => to_image();
                 $scope.clickToSign = () => assinar();
                 $scope.clickToScan = () => scanCode();
                 $scope.produtos = [];
                 $scope.formData = {}; // todos os campos do formulário
                 $scope.CurrentDate = new Date();
-                $scope.enviarAPI = () => showToast('Not implemented.');
+                $scope.enviarAPI = () => enviarAPI.enviarColeta($scope.listarColeta)
                 // faz a requisição da api e salva no banco local
                 $scope.baixarListaDaAPI = () => {
                     requestProdutosAPI();

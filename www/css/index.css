@@ -1,0 +1,69 @@
+.brand-logo img {
+    width: 60px !important;
+}
+/*header nav {*/
+    /*position: fixed;*/
+    /*z-index: 997;*/
+    /*bottom: 0;*/
+/*}*/
+
+.flex-evenly {
+    justify-content: space-evenly;
+    display: flex;
+}
+.d-flex {
+    display: flex;
+}
+.d-flex .btn-large {
+    background-color: #013760;
+    width: 100%;
+}
+.fixed-bottom {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+nav .sidenav-trigger {
+	margin: 0;
+}
+
+.collection.with-header .material-icons {
+    color:  #013760;
+}
+
+li .input-field {
+    margin-bottom: 0;
+}
+.modal.bottom-sheet {
+    max-height: none;
+}
+
+    .modal.bottom-sheet .modal-content {
+        padding: 10px;
+        padding-top: 0;
+        padding-right: 20px;
+    }
+
+#produtoModal .modal-close {
+    text-align: right;
+    width: 100%;
+}
+
+.p0 {
+    padding: 0 !important;
+}
+
+.collection {
+    border: none;
+}
+#produtoModal button.btn {
+    display: block;
+    margin: 0 auto;
+}
+
+.codigo-de-barras {
+    transform: rotate(90deg);
+    top: auto !important;
+    bottom: 0;
+}

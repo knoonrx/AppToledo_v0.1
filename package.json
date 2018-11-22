@@ -1,0 +1,23 @@
+{
+    "name": "AppToledo",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "cordova-android": "^7.1.1",
+        "cordova-ios": "4.2.0",
+        "cordova-plugin-whitelist": "1.2.2",
+        "cordova-windows": "4.4.2",
+        "phonegap-plugin-barcodescanner": "6.0.8"
+    },
+    "cordova": {
+        "platforms": [
+            "android",
+            "ios",
+            "windows"
+        ],
+        "plugins": {
+            "cordova-plugin-whitelist": {},
+            "phonegap-plugin-barcodescanner": {}
+        }
+    }
+}

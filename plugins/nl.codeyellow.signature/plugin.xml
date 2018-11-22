@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="nl.codeyellow.signature"
+    version="0.1">
+  <name>Signature view plugin</name>
+  <license>Apache 2.0 License</license>
+  <author>Code Yellow B.V.</author>
+  <description>
+    Native view plugin to request and capture the user's written
+    signature.  Currently contains a native Android implementation and
+    a pure JS fallback implementation for other devices (including
+    desktop browsers).
+  </description>
+
+  <info>
+    In order to make the fallback implementation work even on a
+    desktop browser, a file called signature-view.js is copied into
+    the "js" directory below the root of your "www" directory.  Do
+    *not* remove this file, as "plugin remove" doesn't handle removed
+    files gracefully.
+
+    If you want to use the fallback behaviour, add a script tag
+    loading signature.js to your index.html or load it through your
+    preferred inclusion mechanism.  It defines a global "SignatureView"
+    variable (a property on the "window" object).  If you're using an
+    AMD loader, instead it will define a module by the name of
+    "cordova.signature-view".
+
+    If you're only interested in the native implementation, use
+    cordova.require('nl.codeyellow.signature.Signature') instead.  The
+    API is identical to the one defined by the fallback
+    implementation.
+  </info>
+  
+	<!-- Using a relative target is a dirty stinking hack, but it works!-->
+  	<!-- <asset src="www/signature-view.js" target="../../../../www/js/signature-view.js" /> -->
+  
+  	<!--
+  	<js-module src="www/signature-view.js name="Signature">
+		<clobbers target="cordova.plugins.webp"/>
+	</js-module>
+	-->
+	
+	<dependency id="org.apache.cordova.device" />
+	
+	<!-- android -->
+	<platform name="android">
+		<config-file target="res/xml/config.xml" parent="/widget">
+			<feature name="Signature">
+				<param name="android-package" value="nl.codeyellow.plugin.SignaturePlugin"/>
+				<!-- <param name="onload" value="true"/> -->
+			</feature>
+		</config-file>
+		
+		<js-module src="www/signature-view-native.js" name="Signature" />
+		
+		<source-file src="src/android/nl/codeyellow/app/SignatureDialogFragment.java" target-dir="src/nl/codeyellow/app" />
+		<source-file src="src/android/nl/codeyellow/plugin/SignaturePlugin.java" target-dir="src/nl/codeyellow/plugin" />
+		<source-file src="src/android/com/github/gcacace/signaturepad/views/SignaturePad.java" target-dir="src/com/github/gcacace/signaturepad/views" />
+		<source-file src="src/android/com/github/gcacace/signaturepad/utils/Bezier.java" target-dir="src/com/github/gcacace/signaturepad/utils" />
+		<source-file src="src/android/com/github/gcacace/signaturepad/utils/ControlTimedPoints.java" target-dir="src/com/github/gcacace/signaturepad/utils" />
+		<source-file src="src/android/com/github/gcacace/signaturepad/utils/TimedPoint.java" target-dir="src/com/github/gcacace/signaturepad/utils" />
+	</platform>
+
+</plugin>

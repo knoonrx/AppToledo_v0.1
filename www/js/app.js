@@ -99,6 +99,28 @@ let ipt = angular.module('app', [])
                         document.getElementById('toast-container').addEventListener('click', e => M.Toast.dismissAll());
                     });
                 };
+                const assinar = () => {
+                    const Signature = cordova.require('nl.codeyellow.signature.Signature');
+                    Signature.getSignature(
+                        function (imgData) {
+                            /* This is the "success" callback. */
+                            if (!imgData) return; // User clicked cancel, we got no image data.
+
+                            var canvas = document.getElementById('signature'),
+                            ctx = canvas.getContext('2d');
+                            canvas.width = imgData.width;
+                            canvas.height = imgData.height;
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.putImageData(imgData, 0, 0);
+                        }, function (msg) {
+                            /* This is the "error" callback. */
+                            alert('Could not obtain a signature due to an error: ' + msg);
+                        },
+                        /* This final string is optional and defaults to a similar string. */
+                        'Please put your signature down below');
+                };
+
+                $scope.clickToSign = () => assinar();
                 $scope.clickToScan = () => scanCode();
                 $scope.produtos = [];
                 $scope.formData = {}; // todos os campos do formulário

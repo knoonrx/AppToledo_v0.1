@@ -14,7 +14,7 @@ let ipt = angular.module('app', [])
         };
     })
     .factory('enviarAPI', $http => {
-        $http.defaults.headers.post["Content-Type"] = "application/json";
+        //$http.defaults.headers.post["Content-Type"] = "application/json";
         return {
             postImage: dados => $http({
                 url: 'http://alessandro.softhotelaria.com/api/UploadCustomerImage',
@@ -23,11 +23,12 @@ let ipt = angular.module('app', [])
             })
             .then(response =>  console.log(response)),
             enviarColeta: dados => $http({
-                url: 'http://alessandro.softhotelaria.com/api/UploadCustomerImage',
+                url: 'http://alessandro.softhotelaria.com/api/Coletas/inserir',
                 method: 'POST',
                 data: JSON.stringify(dados),
             })
             .then(response =>  console.log(response))
+            .catch(error => console.log(error))
         }
     })
     .controller('IndexController',

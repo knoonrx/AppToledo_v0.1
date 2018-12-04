@@ -1,7 +1,13 @@
+// const apiUrl = 'http://alessandro.softhotelaria.com/api/';
+const apiUrl = 'http://localhost:60451/';
+
 let ipt = angular.module('app', [])
     .factory('produtosAPI', $http => {
+        $http.defaults.headers.post["Content-Type"] = "application/json";
+        $http.defaults.headers.post["X-Requested-With"] = "XMLHttpRequest";
+        $http.defaults.headers.post["Access-Control-Allow-Origin"] = true;
         return {
-            GetProdutos: () => $http.get('http://alessandro.softhotelaria.com/api/Produtos/Listar'),
+            GetProdutos: () => $http.get(apiUrl + 'Produtos/Listar'),
         }
     })
     .factory('databaseAPI', ($q) => {
@@ -14,21 +20,24 @@ let ipt = angular.module('app', [])
         };
     })
     .factory('enviarAPI', $http => {
-        //$http.defaults.headers.post["Content-Type"] = "application/json";
+        $http.defaults.headers.post["Content-Type"] = "application/json";
+        $http.defaults.headers.post["X-Requested-With"] = "XMLHttpRequest";
+        $http.defaults.headers.post["Access-Control-Allow-Origin"] = true;
         return {
             postImage: dados => $http({
-                url: 'http://alessandro.softhotelaria.com/api/UploadCustomerImage',
+                url: apiUrl + 'UploadCustomerImage',
                 method: 'POST',
                 data: JSON.stringify(dados),
-            })
-            .then(response =>  console.log(response)),
-            enviarColeta: dados => $http({
-                url: 'http://alessandro.softhotelaria.com/api/Coletas/inserir',
-                method: 'POST',
-                data: JSON.stringify(dados),
-            })
-            .then(response =>  console.log(response))
-            .catch(error => console.log(error))
+            }).then(response => console.log(response)),
+            enviarColeta: (dados,showToast) => {
+                $http.post(apiUrl + 'Coletas/inserir', JSON.stringify(dados), {})
+                    .then(response =>{                        
+                        if (response.status === 201)
+                        showToast('Os produtos foram enviados com sucesso')
+                        else showToast('Algo saiu errado, verifique o status: '+response.status);                    
+                    })
+                    .catch(e => console.error('algo deu errado: ', e, JSON.stringify(dados)));
+            }
         }
     })
     .controller('IndexController',
@@ -48,39 +57,39 @@ let ipt = angular.module('app', [])
                 };
                 const scanCode = () => {
                     cordova.plugins.barcodeScanner.scan(
-                          function (result) {
-                              $scope.mostrarProdutoBarCod = $scope.produtosLista.map(p => {
-                                  if (p.Codigobarras == result.text) {
-                                      showToast('Produto encontrado por favor aguarde...')
+                        function (result) {
+                            $scope.mostrarProdutoBarCod = $scope.produtosLista.map(p => {
+                                if (p.Codigobarras == result.text) {
+                                    showToast('Produto encontrado por favor aguarde...')
 
-                                      $scope.ProdutoBarCode = p.Codigobarras;
-                                      $scope.ProdutoNome = p.Nome;
-                                      $scope.ProdutoMarca = p.Marca;
-                                      $scope.ProdutoId = p.Id;
-                                      $scope.produto = p;
-                                      document.getElementById('preco').focus();
-                                      instance.open();
-                                  }
-                              });
+                                    $scope.ProdutoBarCode = p.Codigobarras;
+                                    $scope.ProdutoNome = p.Nome;
+                                    $scope.ProdutoMarca = p.Marca;
+                                    $scope.ProdutoId = p.Id;
+                                    $scope.produto = p;
+                                    document.getElementById('preco').focus();
+                                    instance.open();
+                                }
+                            });
 
-                          },
-                          function (error) {
-                              alert("Não foi possível escanear o produto: " + error);
-                          },
-                          {
-                              preferFrontCamera: false, // iOS and Android
-                              showFlipCameraButton: true, // iOS and Android
-                              showTorchButton: true, // iOS and Android
-                              torchOn: false, // Android, launch with the torch switched on (if available)
-                              saveHistory: true, // Android, save scan history (default false)
-                              prompt: "Place a barcode inside the scan area", // Android
-                              resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-                              //formats: "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
-                              orientation: "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
-                              disableAnimations: true, // iOS
-                              disableSuccessBeep: false // iOS and Android
-                          }
-                       );
+                        },
+                        function (error) {
+                            alert("Não foi possível escanear o produto: " + error);
+                        },
+                        {
+                            preferFrontCamera: false, // iOS and Android
+                            showFlipCameraButton: true, // iOS and Android
+                            showTorchButton: true, // iOS and Android
+                            torchOn: false, // Android, launch with the torch switched on (if available)
+                            saveHistory: true, // Android, save scan history (default false)
+                            prompt: "Place a barcode inside the scan area", // Android
+                            resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+                            //formats: "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
+                            orientation: "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
+                            disableAnimations: true, // iOS
+                            disableSuccessBeep: false // iOS and Android
+                        }
+                    );
                 }
                 const getListaProdutosPromise = (tabela) => {
                     let deferred = $q.defer();
@@ -125,7 +134,7 @@ let ipt = angular.module('app', [])
                             if (!imgData) return; // User clicked cancel, we got no image data.
 
                             var canvas = document.getElementById('signature'),
-                            ctx = canvas.getContext('2d');
+                                ctx = canvas.getContext('2d');
                             canvas.width = imgData.width;
                             canvas.height = imgData.height;
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -157,7 +166,10 @@ let ipt = angular.module('app', [])
                 $scope.produtos = [];
                 $scope.formData = {}; // todos os campos do formulário
                 $scope.CurrentDate = new Date();
-                $scope.enviarAPI = () => enviarAPI.enviarColeta($scope.listarColeta)
+                $scope.enviarAPI = async () => {
+                    const lista = await $scope.listarColeta();
+                    enviarAPI.enviarColeta(lista,showToast);
+                }
                 // faz a requisição da api e salva no banco local
                 $scope.baixarListaDaAPI = () => {
                     requestProdutosAPI();
@@ -211,10 +223,10 @@ let ipt = angular.module('app', [])
                                         Nome: d.Nome,
                                         Setor: d.Setor,
                                         ColetaID: item.ColetaID,
-                                        Dia: item.Dia,
+                                        Dia: (new Date(Date.parse(item.Dia))).toLocaleString(),
                                         MercadoId: item.MercadoId,
                                         Pid: item.Pid,
-                                        Preco: formataDinheiro(item.Preco),
+                                        Preco: item.Preco,
                                         id: item.id,
                                     };
                                 }
